@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        [v-cloak] {display: none;}
+    </style>
+</head>
+
+<body>
+<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+<div id="app" v-cloak>
+    <message-list :items="messages" @ondelete="deleteMessage"></message-list>
+    <ul>
+        <li v-for="message in messages">
+            {{ message.text.toLowerCase() }} - {{ message.createdAt }}
+            <button @click="deleteMessage(message)">X</button>
+        </li>
+    </ul>
+</div>
+
+<script type="module">
+import MessageList from './components/MessageList.js'
+let vm = new Vue({
+    el: '#app',
+    data: {
+        messages: [{text:'aaa1', createdAt:'bbb1'},{text:'aaa2', createdAt:'bbb2'}],
+        newMessage: ''
+    },
+    methods: {
+        addMessage(event) {
+            if (!this.newMessage) {return;}
+            this.messages.push({
+                text: this.newMessage, createdAt: new Date()
+            });
+            this.newMessage = '';
+        },
+        deleteMessage(message) {
+            this.messages.splice(this.messages.indexOf(message),1);
+        }
+    },
+    components: {
+        MessageList
+        /*
+        MessageList: MessageList 가
+        파스칼 표기법인 MessageList 가 케밥표기법인 message-list 으로 변환되고
+        message-list
+        위와 같은 이름이 id로 사용된다.
+        * */
+    }
+});
+</script>
+</body>
+</html>
