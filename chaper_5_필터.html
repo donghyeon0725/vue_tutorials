@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        [v-cloak] {display: none;}
+    </style>
+</head>
+<body>
+<div id="app" v-cloak>
+    <ul>
+        <li v-for="message in messages" :data-date="message.createdAt | datetime"><!-- 이런식으로 바인딩 할 때 -->
+            {{ message.text.toLowerCase() | addText(3) }} - {{ message.createdAt  }}<!-- 보간법에 사용이 가능하다. -->
+            <button @click="deleteMessage(message)">X</button>
+        </li>
+    </ul>
+    <form v-on:submit.prevent="addMessage">
+    	<textarea v-model="newMessage" placeholder="메세지를 입력 후 개발자 도구로 속성값을 확인하세요."></textarea>
+        <div><button type="submit" :disabled="addDisabled">Add</button></div>
+    </form>
+</div>
+
+<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+<script src="https://momentjs.com/downloads/moment.js"></script><!-- moment.js 를 가져온다. -->
+
+<script type="module">
+    import './directives/datetime.filter.js'
+    let vm = new Vue({
+        el: '#app',
+        data: {
+            //뷰 내부적으로 이 값을 this 키워드가 참조하게 되고, 이 값들이 태그와 값을 바인딩 하여 하나의 객체로 만든다.
+            messages: [],
+            newMessage: ''
+        },
+        methods: {
+            addMessage(event) {
+                if (!this.newMessage) {return;}
+                this.messages.push({
+                    text: this.newMessage, createdAt: new Date()
+                });
+                this.newMessage = '';
+            },
+            deleteMessage(message) {
+                this.messages.splice(this.messages.indexOf(message),1);
+            }
+        },
+        computed: {
+            addDisabled() {
+                return this.messages.length > 10 || this.newMessage.length > 50;
+                //v-bind:disabled="messages.length >= 10 || this.newMessage.length > 50"
+            }
+        }
+    });
+</script>
+</body>
+</html>
