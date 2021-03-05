@@ -2,8 +2,12 @@
 export default {
     name: 'MessageListItem',
     //mixins: [lifecycleLogger],
-    template: `<li :value="value">{{ item.text }} - {{  item.createdAt }}
-                <button @click="deleteClicked" :disabled="itemCount">X</button></li>`,
+    template:   `
+        <li :value="value">
+            {{ item.text }} - {{  item.createdAt }}
+            <button @click="deleteClicked" :disabled="itemCount">X</button>
+        </li>
+    `,
     props: {
         item: {
             type: Object,
