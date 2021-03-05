@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>라이프 사이클</title>
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+        #app {
+            display: flex;
+        }
+        .block {
+            display: block;
+        }
+        .f-right  {
+            float: right;
+        }
+        .f-left {
+            float: left;
+        }
+        .cart-wrapper {
+            min-width: 130px;
+            background: #e6e6e6;
+            margin: 5px 5px;
+            overflow: auto;
+            align-justify: justify;
+        }
+
+        .preview-wrapper {
+            min-width: 130px;
+            background: #e6e6e6;
+            margin: 5px 5px;
+            overflow: auto;
+            vertical-align: center;
+        }
+
+        .cart {
+            margin-left: auto;
+            margin-right: auto;
+            margin-top: 2px;
+            background-color: bisque;
+            display: block;
+            width: 120px;
+            border: 1px solid blue;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+</head>
+<body>
+<div id="app" v-cloak>
+    <!--cart-list-->
+    <div class="cart-wrapper">
+        <div v-if="cartList.length > 0" v-for="(json, key) in cartList" class="cart" :draggable="draggable" @dragstart='dragStart($event, json.content)'>{{ json.content }}</div>
+
+    </div>
+    <form v-on:submit.prevent="addCard">
+        <div class="contentWrap">
+            <!-- v-model을 통해 값을 연결한다. data에 있는 변수명이 내용물이 된다. -->
+            <textarea v-model="content" name="content" id="content" cols="30" rows="10" class="block" :placeholder="defaultContents" @drop="drop($event)" @dragover="allowDrop($event)" ></textarea>
+            <button type="button" class="f-left">{{ btnStr.left }}</button>
+            <button type="submit" class="f-right">{{ btnStr.right }}</button>
+        </div>
+    </form>
+
+    <div class="preview-wrapper">
+        <div v-if="previewList.length > 0" v-for="(json, key) in previewList" class="cart" @click="deleteCard(key)">{{ json.content }}</div><!-- json, key를 반대로 사용함 -->
+    </div>
+    <!--preview-->
+</div>
+
+<!--
+
+하나. 이동할 요소에 draggable="true" 어트리뷰트를 추가할 것
+둘. 드랍될 엘리먼트의 drop 이벤트에 event.preventDefault()를 사용할 것
+; 드랍 될 요소에 preventDefault를 사용하지 않으면 브라우저에서 드랍 이벤트를 허용하지 않을 수 있습니다.
+
+드래그앤드랍 구현시 단계별로 프로세스를 나누어보면 다음과 같습니다. 이미 아는 내용이라면 바로 예제로 넘어가셔도 됩니다.
+
+1. 드래그를 할 수 있는 부분과 할 수 없는 부분을 나눌 것
+2. 드래그 할 영역은 draggable="true"를 추가할 것
+3. 드래그한 엘리먼트가 드랍될 영역은 event.preventDefault()를 추가할 것
+4. 다음의 스타일을 정의할 것
+  -- 드래그 될 때의 스타일
+  -- 드래그가 다른 엘리먼트 위에 있을 때 스타일
+  -- 다른 엘리먼트 위에 드랍될 때의 스타일
+
+
+-->
+
+<script>
+
+
+const CARD_STORAGE_KEY = "cardStorage";
+const PREVIEW_STORAGE_KEY = "previewStorage";
+
+// localStorage.getItem(CARD_STORAGE_KEY) || "[]" => 자바스크립트의 논리연산자 ||은 참거짓을 반환하는게 아닌, 피연산중 true인 것을 반환하는 연산자이다!!!
+let cartStorage = {
+    fetch: () => JSON.parse(localStorage.getItem(CARD_STORAGE_KEY) || "[]"),
+    save: card => localStorage.setItem(CARD_STORAGE_KEY, JSON.stringify(card)),
+    removeAll: () => localStorage.removeItem(CARD_STORAGE_KEY)
+};
+cartStorage.removeAll();
+
+let previewStorage = {
+    fetch: () => JSON.parse(localStorage.getItem(PREVIEW_STORAGE_KEY) || "[]"),
+    save: card => localStorage.setItem(PREVIEW_STORAGE_KEY, JSON.stringify(card)),
+    removeAll: () => localStorage.removeItem(PREVIEW_STORAGE_KEY)
+};
+
+
+
+/*cartStorage.removeAll();
+previewStorage.removeAll();*/
+
+//previewStorage.save({name:'sds',content:'내용'});
+let app = new Vue({
+    el: '#app',
+    data: {
+        btnStr: {
+            left : '비동기로 데이터 요청',
+            right : '카드 삽입하기'
+        },
+        content: '',
+        cartList: cartStorage.fetch(),
+        previewList: previewStorage.fetch()
+    },
+    methods: {
+
+        addCard(event) {
+            if (!this.content) {
+                return;
+            }
+            this.previewList.push({content: this.content});
+            this.content = "";
+        },
+        deleteCard(key) {
+            console.log(key);
+            this.previewList.splice(key, 1);
+        },
+        dragStart(evt, content) {
+            evt.dataTransfer.dropEffect = 'move'
+            evt.dataTransfer.effectAllowed = 'move'
+            evt.dataTransfer.setData('itemID', content)
+        },
+        allowDrop(event) {
+            event.preventDefault();
+        },
+        drop:function(evt) {
+            evt.preventDefault();
+            const itemID = evt.dataTransfer.getData('itemID')
+            this.content = itemID;
+        }
+    },
+    computed: {
+        defaultContents() {
+            return '내용을 입력해주세요.';
+        },
+        draggable() {
+            return true;
+        }
+    },
+    beforeCreate() {
+        console.log('beforeCreate', this.btnStr);
+    },
+    created() {
+        console.log('beforeCreate', this.btnStr);
+        this.cartList.push({content: '내용1'});
+        this.cartList.push({content: '내용2'});
+    },
+    beforeMount() {
+        alert('beforeMount => 랜더링 이전(내부 노드 추가 안된 상태)');
+    },
+    mounted() {
+        alert('mounted => 랜더링 이후');
+    },
+    beforeUpdate() {
+        alert('beforeUpdate')
+    },
+    updated() {
+        alert('updated')
+    },
+    beforeDestroy() {
+
+    },
+    destroyed() {
+
+    },
+    // 변화를 보고 있다가 변화발생 시 작동할 옵션
+    watch: {
+        previewList: {
+            handler: function(aa) {
+                previewStorage.save(aa);
+            },
+            deep: true
+        },
+        cartList:{
+            handler: function(aa) {
+                cartStorage.save(aa);
+            },
+            deep: true
+        }
+    }
+});
+
+
+
+
+</script>
+
+</body>
+</html>
