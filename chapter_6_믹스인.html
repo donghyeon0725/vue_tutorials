@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+
 <div id="app" v-cloak>
     <message-list :items="messages" @ondelete="deleteMessage"></message-list>
     <ul>
@@ -20,8 +20,9 @@
     </ul>
 </div>
 
+<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
 <script type="module">
-    //import lifecycleLogger from './mixins/lifecycle-logger.mixin.js';  => 이는 디버깅(라이프 사이클 추적)에 유용하게 사용할 수 있지만, 일일이 추가해줘야 한다는 단점이 있다. 대신 확장 플러그인을 통해서 기능을 사용할 수 있다.
+    //import lifecycleLogger from './mixins/lifecycle-logger.mixin.js';  // => 이는 디버깅(라이프 사이클 추적)에 유용하게 사용할 수 있지만, 일일이 추가해줘야 한다는 단점이 있다. 대신 확장 플러그인을 통해서 기능을 사용할 수 있다.
     import MessageList from './components/MessageList.js'
 
 

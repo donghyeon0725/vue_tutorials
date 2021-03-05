@@ -9,7 +9,7 @@
 </head>
 
 <body>
-<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+
 <div id="app" v-cloak>
     <form @submit.prevent="removeTextarea">
     	<textarea v-model="newMessage" placeholder="Leave a message" v-focus>
@@ -18,8 +18,9 @@
     </form>
 </div>
 
+<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
 <script type="module">
-    import './filter/focus.directive.js'
+    import './directives/focus.directive.js'
     //이름 형식은 규약에 따라 꼭 ${directives}/이름.directive.js 로 한다.
     let vm = new Vue({
         el: '#app',
