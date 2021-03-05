@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        [v-cloak] {display: none;}
+    </style>
+</head>
+
+<body>
+<script src="https://unpkg.com/vue@2.5.13/dist/vue.js"></script>
+<div id="app" v-cloak>
+    <message-list :items="messages" @ondelete="deleteMessage"></message-list>
+    <ul>
+        <li v-for="message in messages">
+            {{ message.text.toLowerCase() }} - {{ message.createdAt }}
+            <button @click="deleteMessage(message)">X</button>
+        </li>
+    </ul>
+</div>
+
+<script type="module">
+    //import lifecycleLogger from './mixins/lifecycle-logger.mixin.js';  => 이는 디버깅(라이프 사이클 추적)에 유용하게 사용할 수 있지만, 일일이 추가해줘야 한다는 단점이 있다. 대신 확장 플러그인을 통해서 기능을 사용할 수 있다.
+    import MessageList from './components/MessageList.js'
+
+
+    import LifecycleLogger from './plugins/lifecycle-logger.plugin.js'
+    Vue.use(LifecycleLogger, {beforeMount: false}); // 뷰 인스턴스가 생성 되기 전에 써주기만 자동으로 logger를 사용하게 됨
+    // use 라는 메소드를 꺼내면, 자동으로 install의 프로퍼티를 실행하게 되는 것 같다.
+
+    let vm = new Vue({
+        name: 'MessageApp',
+        //mixins: [lifecycleLogger],
+        el: '#app',
+        data: {
+            messages: [{text:'aaa1', createdAt:'bbb1'},{text:'aaa2', createdAt:'bbb2'}],
+            newMessage: ''
+        },
+        methods: {
+            addMessage(event) {
+                if (!this.newMessage) {return;}
+                this.messages.push({
+                    text: this.newMessage, createdAt: new Date()
+                });
+                this.newMessage = '';
+            },
+            deleteMessage(message) {
+                this.messages.splice(this.messages.indexOf(message),1);
+            }
+        },
+        components: {
+            MessageList
+        }
+    });
+
+</script>
+</body>
+</html>

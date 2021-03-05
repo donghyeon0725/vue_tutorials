@@ -1,5 +1,7 @@
+//import lifecycleLogger from '../mixins/lifecycle-logger.mixin.js';
 export default {
     name: 'MessageListItem',
+    //mixins: [lifecycleLogger],
     template: `<li :value="value">{{ item.text }} - {{  item.createdAt }}
                 <button @click="deleteClicked" :disabled="itemCount">X</button></li>`,
     props: {
